@@ -26,3 +26,10 @@ material 0
 TRANS       0 0 -1
 ROTAT       0 0 0
 SCALE       1 1 1
+
+OBJECT 1
+sphere
+material 0
+TRANS       0 -100.5 -1
+ROTAT       0 0 0
+SCALE       200 200 200
