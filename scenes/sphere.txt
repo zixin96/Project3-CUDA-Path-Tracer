@@ -1,6 +1,6 @@
 // Emissive material (light)
 MATERIAL 0
-RGB         1 1 1
+RGB         1 0 0
 SPECEX      0
 SPECRGB     0 0 0
 REFL        0
@@ -10,7 +10,7 @@ EMITTANCE   5
 
 // Camera
 CAMERA
-RES         400 225
+RES         1600 900
 FOVY        45
 ITERATIONS  5000
 DEPTH       8
@@ -19,3 +19,10 @@ EYE         0 0 0
 LOOKAT      0 0 -1
 UP          0 1 0
 
+// Sphere
+OBJECT 0
+sphere
+material 0
+TRANS       0 0 -1
+ROTAT       0 0 0
+SCALE       1 1 1
