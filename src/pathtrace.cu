@@ -129,7 +129,7 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Path
         PathSegment & segment = pathSegments[index];
 
         segment.ray.origin = cam.position;
-    segment.color = glm::vec3(1.0f, 1.0f, 1.0f);
+        segment.color = glm::vec3(1.0f, 1.0f, 1.0f);
 
         // TODO: implement antialiasing by jittering the ray
         segment.ray.direction = glm::normalize(cam.view
@@ -258,7 +258,9 @@ __global__ void shadeFakeMaterial (
     // used for opacity, in which case they can indicate "no opacity".
     // This can be useful for post-processing and image compositing.
     } else {
-      pathSegments[idx].color = glm::vec3(0.0f);
+        glm::vec3 unitDirection = glm::normalize(pathSegments[idx].ray.direction);
+        float t = 0.5f * (unitDirection[1] + 1.0f);
+        pathSegments[idx].color = (1.0f - t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
     }
   }
 }
