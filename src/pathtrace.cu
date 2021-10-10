@@ -251,7 +251,8 @@ __global__ void shadeFakeMaterial (
       // like what you would expect from shading in a rasterizer like OpenGL.
       // TODO: replace this! you should be able to start with basically a one-liner
       else {
-          pathSegments[idx].color = material.color;
+          glm::vec3 N = intersection.surfaceNormal;
+          pathSegments[idx].color = 0.5f * glm::vec3(N[0] + 1, N[1] + 1, N[2] + 1);
       }
     // If there was no intersection, color the ray black.
     // Lots of renderers use 4 channel color, RGBA, where A = alpha, often
