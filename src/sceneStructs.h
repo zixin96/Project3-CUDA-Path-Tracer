@@ -73,4 +73,14 @@ struct ShadeableIntersection {
   float t;
   glm::vec3 surfaceNormal;
   int materialId;
+  glm::vec3 intersectionPoint;
+};
+
+struct isTerminated
+{
+    __host__ __device__
+        bool operator()(const PathSegment& p)
+    {
+        return p.remainingBounces > 0;
+    }
 };
