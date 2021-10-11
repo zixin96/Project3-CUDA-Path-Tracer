@@ -68,3 +68,12 @@ if  (Metal) scatter returns false, return Color3f(0.f). This corresponds to
         }
 ```
 
+Why white sphere boundary? 
+
+Observe that sphere boundary has reflected ray direction goes below the surface. If we terminate the ray path (by setting the remaining bounces to 0), but don't set the color to black( color *= BLACK), there will be extra energy incorrectly residing in the ray path. 
+
+TODO: Try to find the location of the pixel of the white boundary, and set break point to see the ray bounce. 
+
+1) find out the location of the wrong pixel using GIMP
+2) convert this coordinate into pixel index
+3) set breakpoint based on pixel index to see how the color of this pixel is calculated based on rays.
