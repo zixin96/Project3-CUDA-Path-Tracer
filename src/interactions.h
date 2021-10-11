@@ -122,9 +122,19 @@ void scatterRay(
         // from a point that is not occluded by the surface
         pathSegment.ray.origin = intersect - (EPSILON * 10.f) * normal;
         glm::vec3 unitRayDir = glm::normalize(pathSegment.ray.direction);
-        glm::vec3 refractedDir = glm::refract(unitRayDir, normal, refractionRatio);
+        float cosTheta = fmin(glm::dot(-unitRayDir, normal), 1.0f);
+        float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
+        bool cannotReflect = refractionRatio * sinTheta > 1.0f;
+        glm::vec3 newRayDir;
+        if (cannotReflect)
+        {
+            newRayDir = glm::reflect(unitRayDir, normal);
+        }
+        else {
+            newRayDir = glm::refract(unitRayDir, normal, refractionRatio);
+        }
         pathSegment.color *= m.color;
-        pathSegment.ray.direction = glm::normalize(refractedDir);
+        pathSegment.ray.direction = glm::normalize(newRayDir);
         pathSegment.remainingBounces--;
     }
     else {
