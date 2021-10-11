@@ -77,3 +77,20 @@ TODO: Try to find the location of the pixel of the white boundary, and set break
 1) find out the location of the wrong pixel using GIMP
 2) convert this coordinate into pixel index
 3) set breakpoint based on pixel index to see how the color of this pixel is calculated based on rays.
+
+
+
+
+
+WHITE SPHERE refractive bug:
+
+Spheres are white. Refractive rays doesn't work. 
+
+pathSegment.ray.origin = intersect - 0.0001f * normal;
+
+Fix: adjust EPISON. 
+
+Was: 0.00001f
+
+Now: 0.0001f
+

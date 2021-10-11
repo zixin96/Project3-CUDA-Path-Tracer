@@ -75,6 +75,7 @@ struct ShadeableIntersection {
   glm::vec3 surfaceNormal;
   int materialId;
   glm::vec3 intersectionPoint;
+  bool outside;
 };
 
 struct isTerminated

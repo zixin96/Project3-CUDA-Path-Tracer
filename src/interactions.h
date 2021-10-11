@@ -85,14 +85,13 @@ void scatterRay(
         PathSegment & pathSegment,
         glm::vec3 intersect,
         glm::vec3 normal,
+        bool outside,
         const Material &m,
         thrust::default_random_engine &rng) {
-    // TODO: implement this.
-    // A basic implementation of pure-diffuse shading will just call the
-    // calculateRandomDirectionInHemisphere defined above.
-    pathSegment.ray.origin = intersect + EPSILON * normal;
+   
     if (m.hasReflective)
     {
+        pathSegment.ray.origin = intersect + EPSILON * normal;
         glm::vec3 reflectedDir = glm::reflect(glm::normalize(pathSegment.ray.direction),
             normal);
         // add fuzziness
@@ -114,7 +113,22 @@ void scatterRay(
             pathSegment.remainingBounces = 0;
         }
     }
+    else if (m.hasRefractive)
+    {
+        float refractionRatio = outside ? (1.f / m.indexOfRefraction) : m.indexOfRefraction;
+        // refractive rays always shoots towards negative normal direction: that's why we use subtraction
+        // since intersect falls slightly short to the object it's hitting, 
+        // we need a bigger EPSILON so that reflective rays are shoot 
+        // from a point that is not occluded by the surface
+        pathSegment.ray.origin = intersect - (EPSILON * 10.f) * normal;
+        glm::vec3 unitRayDir = glm::normalize(pathSegment.ray.direction);
+        glm::vec3 refractedDir = glm::refract(unitRayDir, normal, refractionRatio);
+        pathSegment.color *= m.color;
+        pathSegment.ray.direction = glm::normalize(refractedDir);
+        pathSegment.remainingBounces--;
+    }
     else {
+        pathSegment.ray.origin = intersect + EPSILON * normal;
         glm::vec3 diffuseDir = glm::normalize(calculateRandomDirectionInHemisphere(normal, rng));
         pathSegment.color *= m.color;
         pathSegment.ray.direction = diffuseDir;
