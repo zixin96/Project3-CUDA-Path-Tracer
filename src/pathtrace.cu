@@ -268,7 +268,7 @@ __global__ void shadeMaterial (
         } else {
             glm::vec3 unitDirection = glm::normalize(pathSegments[idx].ray.direction);
             float t = 0.5f * (unitDirection[1] + 1.0f);
-            pathSegments[idx].color = (1.0f - t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
+            pathSegments[idx].color *= (1.0f - t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
             pathSegments[idx].remainingBounces = 0;
         }
     }
