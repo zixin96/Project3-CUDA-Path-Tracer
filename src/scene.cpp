@@ -159,8 +159,12 @@ int Scene::loadMaterial(string materialid) {
         cout << "Loading Material " << id << "..." << endl;
         Material newMaterial;
 
+        // Adding a new material property needs two modifications: 
+        // 1) i < (value + 1)
+        // 2) else if statement
+        
         //load static properties
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             string line;
             utilityCore::safeGetline(fp_in, line);
             vector<string> tokens = utilityCore::tokenizeString(line);
@@ -180,6 +184,10 @@ int Scene::loadMaterial(string materialid) {
                 newMaterial.indexOfRefraction = atof(tokens[1].c_str());
             } else if (strcmp(tokens[0].c_str(), "EMITTANCE") == 0) {
                 newMaterial.emittance = atof(tokens[1].c_str());
+            }
+            // Added fuzziness
+            else if (strcmp(tokens[0].c_str(), "FUZZ") == 0) {
+                newMaterial.fuzziness = atof(tokens[1].c_str());
             }
         }
         materials.push_back(newMaterial);

@@ -41,6 +41,20 @@ glm::vec3 calculateRandomDirectionInHemisphere(
         + sin(around) * over * perpendicularDirection2;
 }
 
+__host__ __device__
+glm::vec3 calculateRandomDirectionInSphere(thrust::default_random_engine& rng)
+{
+    thrust::uniform_real_distribution<float> u01(-1.f, 1.0f);
+    while (true)
+    {
+        glm::vec3 p = glm::vec3(u01(rng), u01(rng), u01(rng));
+        float length = glm::length(p);
+        if (length >= 1.0f) { continue; }
+        return p;
+    }
+}
+
+
 /**
  * Scatter a ray with some probabilities according to the material properties.
  * For example, a diffuse surface scatters in a cosine-weighted hemisphere.
@@ -81,15 +95,31 @@ void scatterRay(
     {
         glm::vec3 reflectedDir = glm::reflect(glm::normalize(pathSegment.ray.direction),
             normal);
-        pathSegment.color *= m.specular.color;
-        pathSegment.ray.direction = reflectedDir;
-       
-
+        // add fuzziness
+        reflectedDir += m.fuzziness * calculateRandomDirectionInSphere(rng);
+     
+        if (glm::dot(reflectedDir, normal) > 0.0f)
+        {
+            pathSegment.color *= m.specular.color;
+            pathSegment.ray.direction = glm::normalize(reflectedDir);
+            pathSegment.remainingBounces--;
+        }
+        // for big sphere or grazing rays, we may scatter below the 
+        // surface. In this case, terminate this segment. 
+        else {
+            // NOTE: this line is necessary to prevent the white boundary
+            // if we terminate the ray path because reflected ray goes below
+            // the surface, this path's contribution should be set to black (0.f)
+            pathSegment.color *= glm::vec3(0.f);
+            pathSegment.remainingBounces = 0;
+        }
     }
     else {
         glm::vec3 diffuseDir = glm::normalize(calculateRandomDirectionInHemisphere(normal, rng));
         pathSegment.color *= m.color;
         pathSegment.ray.direction = diffuseDir;
+        // diffuse always scatter
+        pathSegment.remainingBounces--;
     }
-    pathSegment.remainingBounces--;
+
 }
