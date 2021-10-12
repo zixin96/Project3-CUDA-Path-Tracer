@@ -112,6 +112,18 @@ void pathtraceFree() {
     checkCUDAError("pathtraceFree");
 }
 
+__host__ __device__ glm::vec3 randomInUnitDisk(thrust::default_random_engine& rng)
+{
+    thrust::uniform_real_distribution<float> u01(-1.0f, 1.0f);
+    while (true)
+    {
+        glm::vec3 p(u01(rng), u01(rng), 0.0f);
+        float length = glm::length(p);
+        if (length >= 1.0f) { continue; }
+        return p;
+    }
+}
+
 /**
 * Generate PathSegments with rays from the camera through the screen into the
 * scene, which is the first bounce of rays.
