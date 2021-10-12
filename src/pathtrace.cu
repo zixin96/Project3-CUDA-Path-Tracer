@@ -263,7 +263,8 @@ __global__ void shadeMaterial (
                     intersection.surfaceNormal,
                     intersection.outside, 
                     material,
-                    rng);
+                    rng,
+                    intersection);
             }
         // If there was no intersection, color the ray black.
         // Lots of renderers use 4 channel color, RGBA, where A = alpha, often

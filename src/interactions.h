@@ -54,6 +54,14 @@ glm::vec3 calculateRandomDirectionInSphere(thrust::default_random_engine& rng)
     }
 }
 
+__host__ __device__
+float reflectance(float cosine, float refIdx)
+{
+    // Use Schlick's approximation for reflectance.
+    float r0 = (1.0f - refIdx) / (1.0f + refIdx);
+    r0 *= r0;
+    return r0 + (1.0f - r0) * glm::pow(1.0f - cosine, 5.0f);
+}
 
 /**
  * Scatter a ray with some probabilities according to the material properties.
@@ -87,8 +95,11 @@ void scatterRay(
         glm::vec3 normal,
         bool outside,
         const Material &m,
-        thrust::default_random_engine &rng) {
-   
+        thrust::default_random_engine &rng, 
+    const ShadeableIntersection& sInter) {
+
+    thrust::uniform_real_distribution<float> u01(0, 1);
+
     if (m.hasReflective)
     {
         pathSegment.ray.origin = intersect + EPSILON * normal;
@@ -120,13 +131,13 @@ void scatterRay(
         // since intersect falls slightly short to the object it's hitting, 
         // we need a bigger EPSILON so that reflective rays are shoot 
         // from a point that is not occluded by the surface
-        pathSegment.ray.origin = intersect - (EPSILON * 10.f) * normal;
+        pathSegment.ray.origin = intersect - EPSILON * 10.f * normal;;
         glm::vec3 unitRayDir = glm::normalize(pathSegment.ray.direction);
         float cosTheta = fmin(glm::dot(-unitRayDir, normal), 1.0f);
         float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
         bool cannotReflect = refractionRatio * sinTheta > 1.0f;
         glm::vec3 newRayDir;
-        if (cannotReflect)
+        if (cannotReflect || reflectance(cosTheta, refractionRatio) > u01(rng))
         {
             newRayDir = glm::reflect(unitRayDir, normal);
         }
