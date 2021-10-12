@@ -25,6 +25,7 @@ __host__ __device__ inline unsigned int utilhash(unsigned int a) {
  * Falls slightly short so that it doesn't intersect the object it's hitting.
  */
 __host__ __device__ glm::vec3 getPointOnRay(Ray r, float t) {
+    // return r.origin + (t - .0001f) * glm::normalize(r.direction);
     return r.origin + (t - .0001f) * glm::normalize(r.direction);
 }
 
@@ -126,10 +127,10 @@ __host__ __device__ float sphereIntersectionTest(Geom sphere, Ray r,
         return -1;
     } else if (t1 > 0 && t2 > 0) {
         t = min(t1, t2);
-        outside = true;
+        // outside = true;
     } else {
         t = max(t1, t2);
-        outside = false;
+       // outside = false;
     }
 
     glm::vec3 objspaceIntersection = getPointOnRay(rt, t);
@@ -137,6 +138,12 @@ __host__ __device__ float sphereIntersectionTest(Geom sphere, Ray r,
     intersectionPoint = multiplyMV(sphere.transform, glm::vec4(objspaceIntersection, 1.f));
     normal = glm::normalize(multiplyMV(sphere.invTranspose, glm::vec4(objspaceIntersection, 0.f)));
 
+    if (sphere.scale[0] < 1.0f)
+    {
+        normal = -normal;
+    }
+    
+    outside = glm::dot(r.direction, normal) < 0;
     // make it so that normals always point against the incident ray
     // If the ray is outside the geometry, the normal will point outward, 
     // but if the ray is inside the geometry, the normal will point inward.

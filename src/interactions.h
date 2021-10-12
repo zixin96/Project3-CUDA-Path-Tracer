@@ -131,7 +131,6 @@ void scatterRay(
         // since intersect falls slightly short to the object it's hitting, 
         // we need a bigger EPSILON so that reflective rays are shoot 
         // from a point that is not occluded by the surface
-        pathSegment.ray.origin = intersect - EPSILON * 10.f * normal;;
         glm::vec3 unitRayDir = glm::normalize(pathSegment.ray.direction);
         float cosTheta = fmin(glm::dot(-unitRayDir, normal), 1.0f);
         float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
@@ -139,9 +138,11 @@ void scatterRay(
         glm::vec3 newRayDir;
         if (cannotReflect || reflectance(cosTheta, refractionRatio) > u01(rng))
         {
+            pathSegment.ray.origin = intersect + EPSILON * normal;
             newRayDir = glm::reflect(unitRayDir, normal);
         }
         else {
+            pathSegment.ray.origin = intersect - EPSILON * 10.0f * normal;
             newRayDir = glm::refract(unitRayDir, normal, refractionRatio);
         }
         pathSegment.color *= m.color;
